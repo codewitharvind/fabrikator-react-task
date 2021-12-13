@@ -1,38 +1,188 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/*
+#############################################################################
+# Name : App.css
+# Created by : Arvind Yadav
+# Date       : 7th Dec 2021
+#############################################################################
+*/
+.heading {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  margin-bottom: 30px;
+  justify-content: space-between;
 }
 
-.App-link {
-  color: #61dafb;
+.heading h4 {
+  font-size: 32px;
+  margin: 0;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+div#root > div {
+  max-width: 880px;
+  margin: 130px auto;
+}
+
+.btn {
+  border: 0;
+  padding: 0;
+  background-color: blue;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.btn:hover,
+.btn.cancel:hover {
+  background-color: peru;
+  color: #fff;
+}
+.btn:focus {
+  border: 0;
+}
+.btn_group {
+  display: flex;
+  column-gap: 15px;
+}
+
+.btn.cancel {
+  background-color: #eaeaea;
+  color: #000;
+}
+
+.form_wrapper {
+  border: 1px solid #eaeaea;
+  padding: 40px 0;
+  border-radius: 10px;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+}
+
+.form_wrap .form_group {
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.form_wrap {
+  padding: 0 40px;
+}
+
+.form_wrap .form_group label {
+  flex: 0 0 20%;
+  font-weight: 600;
+}
+.form_wrap .form_group > div,
+.form_wrap .form_group > .form_control {
+  flex: 0 0 80%;
+}
+.form_control {
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid #ababab;
+  box-shadow: none;
+  height: 38px;
+  box-sizing: border-box;
+  padding: 5px 15px;
+}
+
+.form_wrap .form_group > div .form_control {
+  width: 100%;
+}
+
+.react-datepicker__input-container,
+.react-datepicker-wrapper,
+.react-datepicker-wrapper .react-datepicker__input-container,
+.form_control_wrap {
+  display: flex;
+}
+
+.css-1s2u09g-control,
+.form_control.css-b62m3t-container > div.css-1pahdxg-control {
+  /* border: 0 !important; */
+  border: 2px solid #000;
+  background-color: transparent !important;
+  min-height: initial !important;
+  height: 38px;
+  box-shadow: none;
+}
+
+.css-6j8wv5-Input,
+.css-319lph-ValueContainer {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.form_control.css-b62m3t-container {
+  padding: 0;
+  border: 0 !important;
+}
+.form_control.css-b62m3t-container > div.css-1s2u09g-control {
+  /* margin-top: -2px; */
+  border: 1px solid #ababab;
+}
+.css-319lph-ValueContainer {
+  padding-left: 15px !important;
+}
+.form_wrap .form_group > div textarea.form_control {
+  min-height: 70px;
+  max-height: 70px;
+}
+
+.form_wrap2 {
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
+
+.form_wrap2 .form_group {
+  display: block;
+}
+.form_wrap2 .product {
+  flex: 7;
+}
+
+.form_wrap2 .quantity {
+  flex: 3;
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
+
+.form_wrap2 .close {
+  padding: 0;
+  border: 0;
+  font-weight: 700;
+  background-color: transparent;
+  font-size: 16px;
+  transform: scaleX(1.1);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.form_wrap2 .close:hover {
+  transform: rotate(-180deg);
+}
+
+.product_heading .product h6,
+.product_heading .quantity h6 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.form_wrap.form_wrap2.product_heading {
+  background-color: #eaeaea;
+  padding: 20px 40px;
+  margin-bottom: 30px;
+}
+.form_wrap .form_group > div.invalid-feedback {
+  /* flex: 80%; */
+  margin-left: auto;
+  margin-top: 3px;
+  font-size: 13px;
+  color: red;
+  font-weight: 500;
+}
+.form_wrap.form_wrap2 .form_group > div.invalid-feedback {
+  margin-left: 0;
 }

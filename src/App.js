@@ -1,24 +1,17 @@
-import logo from './logo.svg';
+/*
+#############################################################################
+# Name : App.js
+# Created by : Arvind Yadav
+# Date       : 7th Dec 2021
+# Purpose    : This file is used for routing and imports the pages.
+#############################################################################
+*/
 import './App.css';
+import CreatePurchaseOrder from './createPurchaseOrder';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+   <CreatePurchaseOrder/>      
   );
 }
 
