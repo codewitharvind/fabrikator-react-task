@@ -6,12 +6,19 @@
 # Purpose    : This file is used for routing and imports the pages.
 #############################################################################
 */
-import './App.css';
-import CreatePurchaseOrder from './createPurchaseOrder';
-
+import "./App.css";
+import CreatePurchaseOrder from "./createPurchaseOrder";
+import DisplayPurchaseOrder from "./displayPurchaseOrder";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 function App() {
   return (
-   <CreatePurchaseOrder/>      
+    /*  <CreatePurchaseOrder />   */
+    <Router>
+      <Routes>
+        <Route path="/" element={<CreatePurchaseOrder />} />
+        <Route path="/purchase-details" element={<DisplayPurchaseOrder />} />
+      </Routes>
+    </Router>
   );
 }
 

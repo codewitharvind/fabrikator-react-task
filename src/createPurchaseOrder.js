@@ -6,18 +6,59 @@
 # Purpose    : This file is used for creating the purchase order and storing the data of purchase order
 #############################################################################
 */
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 const CreatePurchaseOrder = () => {
+  const navigate = useNavigate();
+  const [productData, setProduct] = useState();
+  const [customerData, setCustomer] = useState();
+  const [timer, setTimer] = useState(null);
+  const [productDetail, setProductDetail] = useState([]);
+  const [productSelect, setProductSelected] = useState([]);
+  const [showForm, setIsForm] = useState(false);
+  const [displaySuggestions, setDisplay] = useState(false);
+  const [productSuggestion, setProductSuggestion] = useState();
+
+  useEffect(() => {
+    const fetchProductData = async () => {
+      axios
+        .get("https://api-staging.fabrikator.io/v1/2/products", {
+          headers: {
+            Authorization: "LHL22QxJv5b5y7xbT8mtp5PAdB7bjpbgFvh2SCT9kNEpVoRb",
+          },
+        })
+        .then((response) => {
+          setProduct(response.data.products);
+        })
+        .catch((error) => {
+          console.log(error.data);
+        });
+    };
+    const fetchCustomerData = async () => {
+      axios
+        .get("https://api-staging.fabrikator.io/v1/2/customers", {
+          headers: {
+            Authorization: "LHL22QxJv5b5y7xbT8mtp5PAdB7bjpbgFvh2SCT9kNEpVoRb",
+          },
+        })
+        .then((response) => {
+          setCustomer(response.data.customers);
+        })
+        .catch((error) => {
+          console.log(error.data);
+        });
+    };
+
+    fetchProductData();
+    fetchCustomerData();
+  }, []);
   /* validationSchema function starts here this function is used for validating the purchase order form */
   const validationSchema = Yup.object().shape({
     supplier: Yup.string().required("Supplier is required"),
-    quantity: Yup.string().required("Quantity is required"),
-    product: Yup.string().required("Product is required"),
     reference: Yup.string().required("Reference is required"),
     note: Yup.string().required("Note is required"),
     orderDate: Yup.string()
@@ -36,21 +77,55 @@ const CreatePurchaseOrder = () => {
   /* validationSchema function ends here */
 
   const formOptions = { resolver: yupResolver(validationSchema) };
-  const { register, handleSubmit, reset, formState } = useForm(formOptions);
+  const { register, handleSubmit, formState } = useForm(formOptions);
   const { errors } = formState;
+  const handleAddrTypeChange = (e, id) => {
+    productData
+      .filter((product) => product.id == id)
+      .map((filteredProduct) => {
+        setProductDetail((productDetail) => [
+          ...productDetail,
+          filteredProduct,
+        ]);
+        setIsForm((current) => !current);
+      });
+  };
+  const buttonHandler = () => {
+    setIsForm((current) => !current);
+  };
+  const buttonClose = (id) => {
+    setProductDetail(productDetail.filter((item) => item.id != id));
+  };
+  const handleInputChange = (e, id) => {
+    if (timer) {
+      clearTimeout(timer);
+      setTimer(null);
+    }
+    setTimer(
+      setTimeout(() => {
+        productSelect.push({ quantity: e.target.value, product: { id: id } });
+      }, 1000)
+    );
+  };
 
-   /* onSubmit function starts here */
+  const handleChange = (e) => {
+    const test = productData.filter((team) => {
+      return team.name.toLowerCase().includes(e.target.value.toLowerCase());
+    });
+    setProductSuggestion(test);
+    setDisplay(true);
+  /*   console.log(productSuggestion); */
+  };
+  /* onSubmit function starts here */
   function onSubmit(data) {
     var purchaseData = {
       purchase_order: {
         order_date: data.orderDate,
         due_date: data.arrivalDate,
-        customer_id: 2,
+        customer_id: parseInt(data.supplier),
         order_no: data.reference,
         note: data.note,
-        line_items_attributes: [
-          { quantity: data.quantity, product: { id: parseInt(data.product) } },
-        ],
+        line_items_attributes: productSelect,
       },
     };
     axios
@@ -63,14 +138,23 @@ const CreatePurchaseOrder = () => {
           },
         }
       )
-      .then((response) => {
-        console.log(response.data);
+      .then((response) => {/* 
+        console.log(response.data.purchase_order); */
+        navigate("../purchase-details", {
+          state: {
+            order_no: response.data.purchase_order.order_no,
+            customer: response.data.purchase_order.customer.name,
+            order_date: response.data.purchase_order.order_date,
+            arrival_date: response.data.purchase_order.due_date,
+            note: response.data.purchase_order.note,
+          },
+        });
       })
       .catch((error) => {
         console.log(error.data);
       });
   }
-   /* onSubmit function ends here */
+  /* onSubmit function ends here */
 
   return (
     <div>
@@ -95,9 +179,12 @@ const CreatePurchaseOrder = () => {
                 }`}
               >
                 <option value="">Please select a supplier</option>
-                <option value="Supplier from EU">Supplier from EU</option>
-                <option value="Anecdote">Anecdote</option>
-                <option value="Awesome">Awesome</option>
+                {customerData &&
+                  customerData.map((customer, c) => (
+                    <option value={customer.id} key={c}>
+                      {customer.name}
+                    </option>
+                  ))}
               </select>
               <div className="invalid-feedback">{errors.supplier?.message}</div>
             </div>
@@ -158,33 +245,124 @@ const CreatePurchaseOrder = () => {
             <div className="product">
               <h6>Product</h6>
             </div>
+            <div className="stock">
+              <h6>In Stock</h6>
+            </div>
             <div className="quantity">
               <h6>Quantity</h6>
             </div>
           </div>
-          <div className="form_wrap form_wrap2">
-            <div className="form_group product">
-              <select
-                name="product"
-                {...register("product")}
-                className={`form_control ${errors.product ? "is-invalid" : ""}`}
-              >
-                <option value="">Type to search products</option>
-                <option value="1">Candy Striped Dress</option>
-              </select>
-              <div className="invalid-feedback">{errors.product?.message}</div>
+          {productDetail.length > 0
+            ? productDetail.map((productInfo, i) => (
+                <div className="form_wrap form_wrap2" key={i}>
+                  {productInfo.name && (
+                    <div className="form_group product">
+                      <div className="form_group image">
+                        <img src={productInfo.product_image_url} />
+                      </div>
+
+                      <div className="form_control after_selected_data">
+                        {productInfo.name}
+                      </div>
+                    </div>
+                  )}
+                  <div className="form_group stock">
+                    <p>{productInfo.stock_count}</p>
+                  </div>
+                  {productInfo.stock_count && (
+                    <div className="form_group quantity">
+                      <input
+                        name={"quantity" + i}
+                        type="number"
+                        {...register("quantity" + i)}
+                        className={`form_control ${
+                          errors.quantity ? "is-invalid" : ""
+                        }`}
+                        onChange={(e) => handleInputChange(e, productInfo.id)}
+                      />
+                      <div
+                        className="close"
+                        onClick={() => buttonClose(productInfo.id)}
+                        type="button"
+                      >
+                        X
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))
+            : null}
+
+          {showForm && (
+            <div className="form_wrap form_wrap2">
+              <div className="form_group product">
+                <div className="form_group image">
+                  <img src="" />
+                </div>
+                {/* <select
+                  name="product"
+                  {...register("product")}
+                  onChange={(e) => handleAddrTypeChange(e)}
+                  className="form_control"
+                >
+                  <option value="">Type to search products</option>
+                  {productData &&
+                    productData.map((product, p) => (
+                      <option value={product.id} key={p}>
+                        {product.name}
+                      </option>
+                    ))}
+                </select> */}
+                <input
+                  type="text"
+                  className="form_control"
+                  placeholder="Enter Product"
+                  onChange={(e) => handleChange(e)}
+                  onBlur={() =>
+                    setTimeout(() => {
+                      setDisplay(false);
+                    }, 300)
+                  }
+                  // onFocus={this.handleChange.bind(this, i)}
+                />
+
+                {displaySuggestions == true ? (
+                  <ul className="product_list">
+                    {productSuggestion.map((item) => {
+                      return (
+                        <li
+                          key={"bnhfc" + item.id}
+                          onClick={(e) => handleAddrTypeChange(e, item.id)}
+                        >
+                          <span className="img">
+                            <img src={item.images} alt="" />
+                          </span>
+                          <span className="name">{item.name}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : null}
+              </div>
+              <div className="form_group stock">
+                <p>-</p>
+              </div>
+              <div className="form_group quantity">
+                <input
+                  name="quantitySelect"
+                  type="number"
+                  {...register("quantitySelect")}
+                  className={`form_control ${
+                    errors.quantity ? "is-invalid" : ""
+                  }`}
+                />
+              </div>
             </div>
-            <div className="form_group quantity">
-              <input
-                name="quantity"
-                type="number"
-                {...register("quantity")}
-                className={`form_control ${
-                  errors.quantity ? "is-invalid" : ""
-                }`}
-              />
-              <div className="invalid-feedback">{errors.quantity?.message}</div>
-            </div>
+          )}
+          <div className="add_btn text-center">
+            <button className="btn" onClick={buttonHandler} type="button">
+              Add New Line
+            </button>
           </div>
         </div>
       </form>
