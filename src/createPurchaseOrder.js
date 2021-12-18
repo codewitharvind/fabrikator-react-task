@@ -21,6 +21,7 @@ const CreatePurchaseOrder = () => {
   const [productSelect, setProductSelected] = useState([]);
   const [showForm, setIsForm] = useState(false);
   const [displaySuggestions, setDisplay] = useState(false);
+  const [hideSubmit, setHideButton] = useState(false);
   const [productSuggestion, setProductSuggestion] = useState();
 
   useEffect(() => {
@@ -92,6 +93,7 @@ const CreatePurchaseOrder = () => {
   };
   const buttonHandler = () => {
     setIsForm((current) => !current);
+    setHideButton(true);
   };
   const buttonClose = (id) => {
     setProductDetail(productDetail.filter((item) => item.id != id));
@@ -104,6 +106,7 @@ const CreatePurchaseOrder = () => {
     setTimer(
       setTimeout(() => {
         productSelect.push({ quantity: e.target.value, product: { id: id } });
+        setHideButton(false);
       }, 1000)
     );
   };
@@ -114,7 +117,7 @@ const CreatePurchaseOrder = () => {
     });
     setProductSuggestion(test);
     setDisplay(true);
-  /*   console.log(productSuggestion); */
+    /*   console.log(productSuggestion); */
   };
   /* onSubmit function starts here */
   function onSubmit(data) {
@@ -162,7 +165,7 @@ const CreatePurchaseOrder = () => {
         <div className="heading">
           <h4>Create Purchase order</h4>
           <div className="btn_group">
-            <button className="btn" type="submit">
+            <button className="btn" type="submit" disabled={hideSubmit}>
               Submit
             </button>
           </div>
@@ -174,9 +177,8 @@ const CreatePurchaseOrder = () => {
               <select
                 name="supplier"
                 {...register("supplier")}
-                className={`form_control ${
-                  errors.supplier ? "is-invalid" : ""
-                }`}
+                className={`form_control ${errors.supplier ? "is-invalid" : ""
+                  }`}
               >
                 <option value="">Please select a supplier</option>
                 {customerData &&
@@ -194,9 +196,8 @@ const CreatePurchaseOrder = () => {
                 name="orderDate"
                 type="date"
                 {...register("orderDate")}
-                className={`form_control ${
-                  errors.orderDate ? "is-invalid" : ""
-                }`}
+                className={`form_control ${errors.orderDate ? "is-invalid" : ""
+                  }`}
               />
               <div className="invalid-feedback">
                 {errors.orderDate?.message}
@@ -208,9 +209,8 @@ const CreatePurchaseOrder = () => {
                 name="arrivalDate"
                 type="date"
                 {...register("arrivalDate")}
-                className={`form_control ${
-                  errors.arrivalDate ? "is-invalid" : ""
-                }`}
+                className={`form_control ${errors.arrivalDate ? "is-invalid" : ""
+                  }`}
               />
               <div className="invalid-feedback">
                 {errors.arrivalDate?.message}
@@ -222,9 +222,8 @@ const CreatePurchaseOrder = () => {
                 name="reference"
                 type="number"
                 {...register("reference")}
-                className={`form_control ${
-                  errors.reference ? "is-invalid" : ""
-                }`}
+                className={`form_control ${errors.reference ? "is-invalid" : ""
+                  }`}
               />
               <div className="invalid-feedback">
                 {errors.reference?.message}
@@ -254,43 +253,42 @@ const CreatePurchaseOrder = () => {
           </div>
           {productDetail.length > 0
             ? productDetail.map((productInfo, i) => (
-                <div className="form_wrap form_wrap2" key={i}>
-                  {productInfo.name && (
-                    <div className="form_group product">
-                      <div className="form_group image">
-                        <img src={productInfo.product_image_url} />
-                      </div>
+              <div className="form_wrap form_wrap2" key={i}>
+                {productInfo.name && (
+                  <div className="form_group product">
+                    <div className="form_group image">
+                      <img src={productInfo.product_image_url} />
+                    </div>
 
-                      <div className="form_control after_selected_data">
-                        {productInfo.name}
-                      </div>
+                    <div className="form_control after_selected_data">
+                      {productInfo.name}
                     </div>
-                  )}
-                  <div className="form_group stock">
-                    <p>{productInfo.stock_count}</p>
                   </div>
-                  {productInfo.stock_count && (
-                    <div className="form_group quantity">
-                      <input
-                        name={"quantity" + i}
-                        type="number"
-                        {...register("quantity" + i)}
-                        className={`form_control ${
-                          errors.quantity ? "is-invalid" : ""
-                        }`}
-                        onChange={(e) => handleInputChange(e, productInfo.id)}
-                      />
-                      <div
-                        className="close"
-                        onClick={() => buttonClose(productInfo.id)}
-                        type="button"
-                      >
-                        X
-                      </div>
-                    </div>
-                  )}
+                )}
+                <div className="form_group stock">
+                  <p>{productInfo.stock_count}</p>
                 </div>
-              ))
+                {productInfo.stock_count && (
+                  <div className="form_group quantity">
+                    <input
+                      name={"quantity" + i}
+                      type="number"
+                      {...register("quantity" + i)}
+                      className={`form_control ${errors.quantity ? "is-invalid" : ""
+                        }`}
+                      onChange={(e) => handleInputChange(e, productInfo.id)}
+                    />
+                    <div
+                      className="close"
+                      onClick={() => buttonClose(productInfo.id)}
+                      type="button"
+                    >
+                      X
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
             : null}
 
           {showForm && (
@@ -323,7 +321,7 @@ const CreatePurchaseOrder = () => {
                       setDisplay(false);
                     }, 300)
                   }
-                  // onFocus={this.handleChange.bind(this, i)}
+                // onFocus={this.handleChange.bind(this, i)}
                 />
 
                 {displaySuggestions == true ? (
@@ -352,13 +350,13 @@ const CreatePurchaseOrder = () => {
                   name="quantitySelect"
                   type="number"
                   {...register("quantitySelect")}
-                  className={`form_control ${
-                    errors.quantity ? "is-invalid" : ""
-                  }`}
+                  className={`form_control ${errors.quantity ? "is-invalid" : ""
+                    }`}
                 />
               </div>
             </div>
           )}
+          {hideSubmit ? <div className="err_mesgae">Add the product and quantity</div> : null}
           <div className="add_btn text-center">
             <button className="btn" onClick={buttonHandler} type="button">
               Add New Line
